@@ -93,10 +93,6 @@ Le système affichera le flux vidéo avec le squelette détecté. En cas de chut
 Basé sur les travaux présentés dans cet article Medium :
 *   [Détection de chute à partir des points du squelette en 2D](https://medium.com/wanabilini/détection-de-chute-à-partir-des-points-du-squelette-en-2d-6cfaa1a7fd72)
 
-## 👤 Auteur
-
-*   **HydroZ987**
-
 
 
 
