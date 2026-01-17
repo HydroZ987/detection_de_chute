@@ -13,6 +13,7 @@ from FallDetectionMethod import MethodeSeuillage
 
 import base64
 from openai import OpenAI
+from alert_agent import AlertAgent
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -25,6 +26,7 @@ if not api_key:
     print("Définissez-la avec: $env:OPENAI_API_KEY='votre-clé-api'")
     
 client_ai = OpenAI(api_key=api_key) if api_key else None
+alert_agent = AlertAgent(source="fall_detection", min_interval_s=10)
 
 def summarize_fall_scene(frames):
     base64Frames = []
@@ -137,7 +139,7 @@ couleur_alarme_position = (255, 0, 0)
 couleur_alarme_acceleration = (255, 0, 0)
 
 # Charger la vidéo à partir du fichier
-video_path = 'DataVideos/50WaysToFall2.mp4'
+video_path = r"C:\Users\lemoi\Desktop\MESPI\detection_de_chute\DataVideos\50WaysToFall2.mp4"
 cap = cv2.VideoCapture(video_path)
 
 # Vérifier que la vidéo s'est bien ouverte
@@ -270,6 +272,16 @@ while cap.isOpened():
 
     if bool_etat_chute:
         cv2.putText(frame, "CHUTE !", (img.shape[1] - 80, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 2)
+        alert_agent.send(
+            event_type="fall",
+            severity="high",
+            message="Chute détectée",
+            payload={
+                "seuil_position": seuil_position,
+                "seuil_acceleration": seuil_acceleration,
+                "source_video": video_path,
+            },
+        )
         if modesave:
             # Enregistrement de la première frame en PNG
             cv2.imwrite("sauvegarde/chute.png", frame)
@@ -297,8 +309,18 @@ while cap.isOpened():
                             resume = summarize_fall_scene(historique_frames[-10:])
                             print("Résumé généré par GPT-4o :", resume)
                         else:
-                            resume = "Chute détectée (OpenAI non configuré)"
+                            resume = "Chute detecte (OpenAI non configuré)"
                             print("Résumé :", resume)
+
+                        alert_agent.send(
+                            event_type="fall_summary",
+                            severity="high",
+                            message=resume,
+                            payload={
+                                "source_video": video_path,
+                                "saved_video": fichier_video,
+                            },
+                        )
 
                         # Envoi du résumé par SMS
                         #message = client.messages.create(
