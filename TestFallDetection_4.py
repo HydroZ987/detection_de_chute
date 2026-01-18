@@ -1,3 +1,5 @@
+# Identifiant de la caméra/source
+CAMERA_ID = "Camera_1"  # À adapter selon la caméra ou la source réelle
 import os
 import sys
 import cv2
@@ -284,6 +286,7 @@ while cap.isOpened():
                 "seuil_position": seuil_position,
                 "seuil_acceleration": seuil_acceleration,
                 "source_video": video_path,
+                "camera": CAMERA_ID
             },
         )
         if modesave:
