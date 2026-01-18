@@ -26,7 +26,11 @@ if not api_key:
     print("Définissez-la avec: $env:OPENAI_API_KEY='votre-clé-api'")
     
 client_ai = OpenAI(api_key=api_key) if api_key else None
-alert_agent = AlertAgent(source="fall_detection", min_interval_s=10)
+alert_agent = AlertAgent(
+    source="fall_detection",
+    server_url="http://localhost:5678/webhook/alert-mespi",  # URL n8n en mode production
+    min_interval_s=10
+)
 
 def summarize_fall_scene(frames):
     base64Frames = []
